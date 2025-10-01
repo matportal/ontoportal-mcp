@@ -1,0 +1,2168 @@
+openapi: 3.0.0
+info:
+  title: OntoPortal API
+  description: The OntoPortal API provides access to a wide range of ontologies and terminologies.
+  version: 1.0.0
+servers:
+  - url: https://demodata.ontoportal.org
+    description: OntoPortal Demo Server
+paths:
+  /search:
+    get:
+      summary: Term Search
+      description: An endpoint for searching terms and their properties.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The search query.
+        - name: ontologies
+          in: query
+          schema:
+            type: string
+          description: Comma-separated list of ontology acronyms to search in.
+        - name: require_exact_match
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: suggest
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: also_search_views
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: require_definitions
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: also_search_properties
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: also_search_obsolete
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: cui
+          in: query
+          schema:
+            type: string
+          description: Comma-separated list of CUIs to restrict the query.
+        - name: semantic_types
+          in: query
+          schema:
+            type: string
+          description: Comma-separated list of TUIs (Semantic Types) to restrict the query.
+        - name: include
+          in: query
+          schema:
+            type: string
+          description: Comma-separated list of attributes to include in the response.
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pagesize
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: language
+          in: query
+          schema:
+            type: string
+            default: 'en'
+        - name: subtree_root_id
+          in: query
+          schema:
+            type: string
+          description: URI encoded class id of the root node for a subtree search.
+        - name: roots_only
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: A list of search results.
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      summary: Term Search (POST)
+      description: An endpoint for searching terms and their properties using a POST request.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q:
+                  type: string
+                ontologies:
+                  type: string
+      responses:
+        '200':
+          description: A list of search results.
+          content:
+            application/json:
+              schema:
+                type: object
+  /property_search:
+    get:
+      summary: Ontology Property Search
+      description: An endpoint for searching ontology properties by their labels and IDs.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The search query.
+        - name: ontologies
+          in: query
+          schema:
+            type: string
+          description: Comma-separated list of ontology acronyms to search in.
+        - name: require_exact_match
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: also_search_views
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: require_definitions
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: include
+          in: query
+          schema:
+            type: string
+        - name: ontology_types
+          in: query
+          schema:
+            type: string
+        - name: property_types
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pagesize
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: A list of property search results.
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      summary: Ontology Property Search (POST)
+      description: An endpoint for searching ontology properties using a POST request.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q:
+                  type: string
+      responses:
+        '200':
+          description: A list of property search results.
+          content:
+            application/json:
+              schema:
+                type: object
+  /annotator:
+    get:
+      summary: Annotator
+      description: The Annotator endpoint will examine text input and return relevant classes.
+      parameters:
+        - name: text
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The text to annotate.
+        - name: ontologies
+          in: query
+          schema:
+            type: string
+        - name: semantic_types
+          in: query
+          schema:
+            type: string
+        - name: expand_semantic_types_hierarchy
+          in: query
+          schema:
+            type: boolean
+        - name: expand_class_hierarchy
+          in: query
+          schema:
+            type: boolean
+        - name: class_hierarchy_max_level
+          in: query
+          schema:
+            type: integer
+        - name: expand_mappings
+          in: query
+          schema:
+            type: boolean
+        - name: stop_words
+          in: query
+          schema:
+            type: string
+        - name: minimum_match_length
+          in: query
+          schema:
+            type: integer
+        - name: exclude_numbers
+          in: query
+          schema:
+            type: boolean
+        - name: whole_word_only
+          in: query
+          schema:
+            type: boolean
+        - name: exclude_synonyms
+          in: query
+          schema:
+            type: boolean
+        - name: longest_only
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: A list of annotations.
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      summary: Annotator (POST)
+      description: The Annotator endpoint using a POST request.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: A list of annotations.
+          content:
+            application/json:
+              schema:
+                type: object
+  /recommender:
+    get:
+      summary: Recommender
+      description: The Recommender endpoint receives a text or a list of keywords and suggests appropriate ontologies for them.
+      parameters:
+        - name: input
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Text or keywords to get recommendations for.
+        - name: input_type
+          in: query
+          schema:
+            type: integer
+            enum: [1, 2]
+            default: 1
+        - name: output_type
+          in: query
+          schema:
+            type: integer
+            enum: [1, 2]
+            default: 1
+        - name: max_elements_set
+          in: query
+          schema:
+            type: integer
+            enum: [2, 3, 4]
+            default: 3
+        - name: wc
+          in: query
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 1
+        - name: wa
+          in: query
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 1
+        - name: wd
+          in: query
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 1
+        - name: ws
+          in: query
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 1
+        - name: ontologies
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of recommended ontologies.
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      summary: Recommender (POST)
+      description: The Recommender endpoint using a POST request.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                input:
+                  type: string
+      responses:
+        '200':
+          description: A list of recommended ontologies.
+          content:
+            application/json:
+              schema:
+                type: object
+  /batch:
+    post:
+      summary: Batch an array of classes
+      description: Retrieve a collection of class resources in a single request.
+      requestBody:
+        description: JSON object containing the list of classes to retrieve.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                "http://www.w3.org/2002/07/owl#Class":
+                  type: object
+                  properties:
+                    collection:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          class:
+                            type: string
+                            format: uri
+                          ontology:
+                            type: string
+                            format: uri
+                    display:
+                      type: string
+      responses:
+        '200':
+          description: A collection of class resources.
+          content:
+            application/json:
+              schema:
+                type: object
+  /analytics:
+    get:
+      summary: Get Ontology Analytics
+      description: Allows to retrieve analytics for all ontologies, optionally filtered by month and year.
+      parameters:
+        - name: month
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+          description: The month to retrieve analytics for (1-12).
+        - name: year
+          in: query
+          schema:
+            type: integer
+            minimum: 2013
+          description: The year to retrieve analytics for (e.g., 2014).
+      responses:
+        '200':
+          description: A list of ontology analytics data.
+          content:
+            application/json:
+              schema:
+                type: object
+  /ontologies/{acronym}/analytics:
+    get:
+      summary: Get Single Ontology Analytics
+      description: Allows to retrieve all analytics data for a single ontology.
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The acronym of the ontology.
+      responses:
+        '200':
+          description: Analytics data for the specified ontology.
+          content:
+            application/json:
+              schema:
+                type: object
+  /ontologies:
+    get:
+      summary: Get all ontologies
+      responses:
+        '200':
+          description: A list of ontologies.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ontology'
+    post:
+      summary: Create an ontology
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ontology'
+      responses:
+        '201':
+          description: Ontology created.
+  /ontologies/{acronym}:
+    get:
+      summary: Get an ontology by acronym
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An ontology.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ontology'
+    put:
+      summary: Update an ontology
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ontology'
+      responses:
+        '200':
+          description: Ontology updated.
+    patch:
+      summary: Partially update an ontology
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ontology'
+      responses:
+        '200':
+          description: Ontology updated.
+    delete:
+      summary: Delete an ontology
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Ontology deleted.
+  /ontologies/{acronym}/download:
+    get:
+      summary: Download an ontology
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The ontology file.
+  /ontologies_full:
+    get:
+      summary: Get all ontologies with full details
+      responses:
+        '200':
+          description: A list of ontologies.
+  /ontologies/{acronym}/pull:
+    post:
+      summary: Pull an ontology from its source
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ontology pull initiated.
+  /ontologies/{acronym}/latest_submission:
+    get:
+      summary: Get the latest submission for an ontology
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The latest submission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OntologySubmission'
+  /ontologies/{ontology}/classes:
+    get:
+      summary: Get classes for an ontology
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of classes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Class'
+  /ontologies/{ontology}/classes/{cls}:
+    get:
+      summary: Get a class from an ontology
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cls
+          in: path
+          required: true
+          schema:
+            type: string
+          description: URI-encoded class ID
+      responses:
+        '200':
+          description: A class.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Class'
+  /ontologies/{ontology}/classes/{cls}/parents:
+    get:
+      summary: Get parents of a class
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cls
+          in: path
+          required: true
+          schema:
+            type: string
+          description: URI-encoded class ID
+      responses:
+        '200':
+          description: A list of parent classes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Class'
+  /ontologies/{ontology}/classes/{cls}/children:
+    get:
+      summary: Get children of a class
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cls
+          in: path
+          required: true
+          schema:
+            type: string
+          description: URI-encoded class ID
+      responses:
+        '200':
+          description: A list of child classes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Class'
+  /ontologies/{ontology}/classes/{cls}/ancestors:
+    get:
+      summary: Get ancestors of a class
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cls
+          in: path
+          required: true
+          schema:
+            type: string
+          description: URI-encoded class ID
+      responses:
+        '200':
+          description: A list of ancestor classes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Class'
+  /ontologies/{ontology}/classes/{cls}/descendants:
+    get:
+      summary: Get descendants of a class
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cls
+          in: path
+          required: true
+          schema:
+            type: string
+          description: URI-encoded class ID
+      responses:
+        '200':
+          description: A list of descendant classes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Class'
+  /ontologies/{ontology}/classes/{cls}/tree:
+    get:
+      summary: Get a tree view of a class
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cls
+          in: path
+          required: true
+          schema:
+            type: string
+          description: URI-encoded class ID
+      responses:
+        '200':
+          description: A tree view of the class.
+  /ontologies/{ontology}/classes/{cls}/paths_to_root:
+    get:
+      summary: Get paths to the root from a class
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cls
+          in: path
+          required: true
+          schema:
+            type: string
+          description: URI-encoded class ID
+      responses:
+        '200':
+          description: A list of paths to the root.
+  /ontologies/{ontology}/classes/roots:
+    get:
+      summary: Get root classes of an ontology
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of root classes.
+  /ontologies/{ontology}/classes/roots_paged:
+    get:
+      summary: Get paged root classes of an ontology
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A paged list of root classes.
+  /submissions:
+    get:
+      summary: Get all submissions
+      responses:
+        '200':
+          description: A list of all submissions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OntologySubmission'
+    post:
+      summary: Create a submission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OntologySubmission'
+      responses:
+        '201':
+          description: Submission created.
+  /categories:
+    get:
+      summary: Get all categories
+      responses:
+        '200':
+          description: A list of categories.
+    post:
+      summary: Create a category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        '201':
+          description: Category created.
+  /categories/{acronym}:
+    get:
+      summary: Get a category by acronym
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A category.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+    put:
+      summary: Update a category
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        '200':
+          description: Category updated.
+    patch:
+      summary: Partially update a category
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        '200':
+          description: Category updated.
+    delete:
+      summary: Delete a category
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Category deleted.
+  /groups:
+    get:
+      summary: Get all groups
+      responses:
+        '200':
+          description: A list of groups.
+    post:
+      summary: Create a group
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        '201':
+          description: Group created.
+  /groups/{acronym}:
+    get:
+      summary: Get a group by acronym
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A group.
+    patch:
+      summary: Update a note
+      parameters:
+        - name: noteid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+      responses:
+        '200':
+          description: Note updated.
+    delete:
+      summary: Delete a note
+      parameters:
+        - name: noteid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Note deleted.
+    put:
+      summary: Update a group
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        '200':
+          description: Group updated.
+    patch:
+      summary: Partially update a group
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        '200':
+          description: Group updated.
+    delete:
+      summary: Delete a group
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Group deleted.
+  /mappings:
+    get:
+      summary: Get all mappings
+      responses:
+        '200':
+          description: A list of mappings.
+    post:
+      summary: Create a mapping
+      responses:
+        '201':
+          description: Mapping created.
+  /mappings/recent:
+    get:
+      summary: Get recent mappings
+      responses:
+        '200':
+          description: A list of recent mappings.
+  /mappings/{mapping}:
+    get:
+      summary: Get a mapping
+      parameters:
+        - name: mapping
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A mapping.
+    delete:
+      summary: Delete a mapping
+      parameters:
+        - name: mapping
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Mapping deleted.
+  /mappings/statistics/ontologies:
+    get:
+      summary: Get mapping statistics for all ontologies
+      responses:
+        '200':
+          description: A list of mapping statistics.
+  /mappings/statistics/ontologies/{ontology}:
+    get:
+      summary: Get mapping statistics for an ontology
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mapping statistics for an ontology.
+  /metrics:
+    get:
+      summary: Get all metrics
+      responses:
+        '200':
+          description: A list of metrics.
+  /metrics/missing:
+    get:
+      summary: Get missing metrics
+      responses:
+        '200':
+          description: A list of missing metrics.
+  /notes:
+    get:
+      summary: Get all notes
+      responses:
+        '200':
+          description: A list of notes.
+    post:
+      summary: Create a note
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+      responses:
+        '201':
+          description: Note created.
+  /notes/{noteid}:
+    get:
+      summary: Get a note by ID
+      parameters:
+        - name: noteid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A note.
+    patch:
+      summary: Update a note
+      parameters:
+        - name: noteid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+      responses:
+        '200':
+          description: Note updated.
+    delete:
+      summary: Delete a note
+      parameters:
+        - name: noteid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Note deleted.
+  /replies:
+    get:
+      summary: Get all replies
+      responses:
+        '200':
+          description: A list of replies.
+    post:
+      summary: Create a reply
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reply'
+      responses:
+        '201':
+          description: Reply created.
+  /replies/{replyid}:
+    get:
+      summary: Get a reply by ID
+      parameters:
+        - name: replyid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A reply.
+    patch:
+      summary: Update a reply
+      parameters:
+        - name: replyid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reply'
+      responses:
+        '200':
+          description: Reply updated.
+    delete:
+      summary: Delete a reply
+      parameters:
+        - name: replyid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Reply deleted.
+  /ontologies/{acronym}/submissions/{ontology_submission_id}:
+    get:
+      summary: Get a submission for an ontology
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ontology_submission_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A submission.
+    patch:
+      summary: Update a submission
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ontology_submission_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OntologySubmission'
+      responses:
+        '200':
+          description: Submission updated.
+    delete:
+      summary: Delete a submission
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ontology_submission_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Submission deleted.
+  /ontologies/{acronym}/submissions/{ontology_submission_id}/download:
+    get:
+      summary: Download a submission
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ontology_submission_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The submission file.
+  /ontologies/{acronym}/submissions/{ontology_submission_id}/download_diff:
+    get:
+      summary: Download a submission diff
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ontology_submission_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The submission diff file.
+  /projects:
+    get:
+      summary: Get all projects
+      responses:
+        '200':
+          description: A list of projects.
+    post:
+      summary: Create a project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+      responses:
+        '201':
+          description: Project created.
+  /projects/{acronym}:
+    get:
+      summary: Get a project by acronym
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A project.
+    put:
+      summary: Update a project
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+      responses:
+        '200':
+          description: Project updated.
+    patch:
+      summary: Partially update a project
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+      responses:
+        '200':
+          description: Project updated.
+    delete:
+      summary: Delete a project
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Project deleted.
+  /provisional_classes:
+    get:
+      summary: Get all provisional classes
+      responses:
+        '200':
+          description: A list of provisional classes.
+    post:
+      summary: Create a provisional class
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProvisionalClass'
+      responses:
+        '201':
+          description: Provisional class created.
+  /provisional_classes/{provisional_class_id}:
+    get:
+      summary: Get a provisional class
+      parameters:
+        - name: provisional_class_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A provisional class.
+    patch:
+      summary: Update a provisional class
+      parameters:
+        - name: provisional_class_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProvisionalClass'
+      responses:
+        '200':
+          description: Provisional class updated.
+    delete:
+      summary: Delete a provisional class
+      parameters:
+        - name: provisional_class_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Provisional class deleted.
+  /provisional_relations:
+    get:
+      summary: Get all provisional relations
+      responses:
+        '200':
+          description: A list of provisional relations.
+    post:
+      summary: Create a provisional relation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProvisionalRelation'
+      responses:
+        '201':
+          description: Provisional relation created.
+  /provisional_relations/{provisional_relation_id}:
+    get:
+      summary: Get a provisional relation
+      parameters:
+        - name: provisional_relation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A provisional relation.
+    delete:
+      summary: Delete a provisional relation
+      parameters:
+        - name: provisional_relation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Provisional relation deleted.
+  /reviews:
+    get:
+      summary: Get all reviews
+      responses:
+        '200':
+          description: A list of reviews.
+    post:
+      summary: Create a review
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        '201':
+          description: Review created.
+  /reviews/{review_id}:
+    get:
+      summary: Get a review
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A review.
+    patch:
+      summary: Update a review
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        '200':
+          description: Review updated.
+    delete:
+      summary: Delete a review
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Review deleted.
+  /slices:
+    get:
+      summary: Get all slices
+      responses:
+        '200':
+          description: A list of slices.
+    post:
+      summary: Create a slice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Slice'
+      responses:
+        '201':
+          description: Slice created.
+  /slices/{slice_id}:
+    get:
+      summary: Get a slice
+      parameters:
+        - name: slice_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A slice.
+    patch:
+      summary: Update a slice
+      parameters:
+        - name: slice_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Slice'
+      responses:
+        '200':
+          description: Slice updated.
+    delete:
+      summary: Delete a slice
+      parameters:
+        - name: slice_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Slice deleted.
+  /users:
+    get:
+      summary: Get all users
+      responses:
+        '200':
+          description: A list of users.
+    post:
+      summary: Create a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User created.
+  /users/{username}:
+    get:
+      summary: Get a user by username
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A user.
+    put:
+      summary: Update a user
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User updated.
+    patch:
+      summary: Partially update a user
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User updated.
+    delete:
+      summary: Delete a user
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: User deleted.
+  /ontologies/{ontology}/properties:
+    get:
+      summary: Get properties for an ontology
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of properties.
+  /ontologies/{ontology}/properties/roots:
+    get:
+      summary: Get root properties for an ontology
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of root properties.
+  /ontologies/{ontology}/properties/{property}:
+    get:
+      summary: Get a property from an ontology
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: property
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A property.
+  /ontologies/{ontology}/metrics:
+    get:
+      summary: Get metrics for an ontology
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metrics for an ontology.
+  /ontologies/{ontology}/submissions/{ontology_submission_id}/metrics:
+    get:
+      summary: Get metrics for an ontology submission
+      parameters:
+        - name: ontology
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ontology_submission_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metrics for an ontology submission.
+  /ontologies/{acronym}/submissions:
+    get:
+      summary: Get submissions for an ontology
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of submissions for an ontology.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OntologySubmission'
+    post:
+      summary: Create a submission for an ontology
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OntologySubmission'
+      responses:
+        '201':
+          description: Submission created.
+components:
+  schemas:
+    Ontology:
+      type: object
+      properties:
+        acronym:
+          type: string
+          description: The ontology acronym.
+        name:
+          type: string
+          description: The ontology name.
+        administeredBy:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+          description: The users who administer the ontology.
+        flat:
+          type: boolean
+        summaryOnly:
+          type: boolean
+        ontologyType:
+          type: string
+        submissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OntologySubmission'
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Note'
+        reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
+        provisionalClasses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProvisionalClass'
+        group:
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        viewingRestriction:
+          type: string
+        doNotUpdate:
+          type: boolean
+        hasDomain:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+        acl:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        viewOf:
+          $ref: '#/components/schemas/Ontology'
+        views:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ontology'
+    Class:
+      type: object
+      properties:
+        prefLabel:
+          type: string
+        synonym:
+          type: array
+          items:
+            type: string
+        definition:
+          type: array
+          items:
+            type: string
+        obsolete:
+          type: boolean
+        semanticType:
+          type: array
+          items:
+            type: string
+        cui:
+          type: array
+          items:
+            type: string
+        label:
+          type: string
+        notation:
+          type: string
+        prefixIRI:
+          type: string
+        parents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Class'
+        ancestors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Class'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Class'
+        subClassOf:
+          type: array
+          items:
+            type: string
+        xref:
+          type: object
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Note'
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+        properties:
+          type: object
+        childrenCount:
+          type: integer
+        hasChildren:
+          type: boolean
+    OntologySubmission:
+      type: object
+      properties:
+        submissionId:
+          type: integer
+        version:
+          type: string
+        status:
+          type: string
+        hasOntologyLanguage:
+          type: string
+          format: uri
+        description:
+          type: string
+        homepage:
+          type: string
+          format: uri
+        documentation:
+          type: string
+          format: uri
+        publication:
+          type: array
+          items:
+            type: string
+        released:
+          type: string
+          format: date-time
+        creationDate:
+          type: string
+          format: date-time
+        contact:
+          type: array
+          items:
+            type: object
+        ontology:
+          $ref: '#/components/schemas/Ontology'
+        prefLabelProperty:
+          type: string
+          format: uri
+        definitionProperty:
+          type: string
+          format: uri
+        synonymProperty:
+          type: string
+          format: uri
+        authorProperty:
+          type: string
+          format: uri
+    Category:
+      type: object
+      properties:
+        acronym:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        created:
+          type: string
+          format: date-time
+        parentCategory:
+          $ref: '#/components/schemas/Category'
+        ontologies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ontology'
+    Group:
+      type: object
+      properties:
+        acronym:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        created:
+          type: string
+          format: date-time
+        ontologies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ontology'
+    Instance:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        add_property_value:
+          type: object
+        properties:
+          type: object
+    Mapping:
+      type: object
+      properties:
+        id:
+          type: string
+        source:
+          type: string
+        classes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Class'
+        process:
+          type: string
+    Metrics:
+      type: object
+      properties:
+        submission:
+          $ref: '#/components/schemas/OntologySubmission'
+        created:
+          type: string
+          format: date-time
+        classes:
+          type: integer
+        individuals:
+          type: integer
+        properties:
+          type: integer
+        maxDepth:
+          type: integer
+        maxChildCount:
+          type: integer
+        averageChildCount:
+          type: number
+        classesWithOneChild:
+          type: integer
+        classesWithMoreThan25Children:
+          type: integer
+        classesWithNoDefinition:
+          type: integer
+    Note:
+      type: object
+      properties:
+        subject:
+          type: string
+        body:
+          type: string
+        creator:
+          $ref: '#/components/schemas/User'
+        created:
+          type: string
+          format: date-time
+        archived:
+          type: boolean
+        createdInSubmission:
+          $ref: '#/components/schemas/OntologySubmission'
+        reply:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reply'
+        relatedOntology:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ontology'
+        relatedClass:
+          type: array
+          items:
+            $ref: '#/components/schemas/Class'
+        proposal:
+          type: object
+    Reply:
+      type: object
+      properties:
+        body:
+          type: string
+        creator:
+          $ref: '#/components/schemas/User'
+        created:
+          type: string
+          format: date-time
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reply'
+        parent:
+          $ref: '#/components/schemas/Reply'
+    ObjectProperty:
+      type: object
+      properties:
+        label:
+          type: string
+        definition:
+          type: string
+        parents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectProperty'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectProperty'
+        submission:
+          $ref: '#/components/schemas/OntologySubmission'
+        ancestors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectProperty'
+        descendants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectProperty'
+    Project:
+      type: object
+      properties:
+        acronym:
+          type: string
+        creator:
+          $ref: '#/components/schemas/User'
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        name:
+          type: string
+        homePage:
+          type: string
+          format: uri
+        description:
+          type: string
+        contacts:
+          type: string
+        institution:
+          type: string
+        ontologyUsed:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ontology'
+    ProvisionalClass:
+      type: object
+      properties:
+        label:
+          type: string
+        synonym:
+          type: array
+          items:
+            type: string
+        definition:
+          type: array
+          items:
+            type: string
+        subclassOf:
+          type: string
+          format: uri
+        creator:
+          $ref: '#/components/schemas/User'
+        created:
+          type: string
+          format: date-time
+        permanentId:
+          type: string
+        noteId:
+          type: string
+        ontology:
+          $ref: '#/components/schemas/Ontology'
+        relations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProvisionalRelation'
+    ProvisionalRelation:
+      type: object
+      properties:
+        source:
+          $ref: '#/components/schemas/ProvisionalClass'
+        relationType:
+          type: string
+        targetClassId:
+          type: string
+        targetClassOntology:
+          $ref: '#/components/schemas/Ontology'
+        creator:
+          $ref: '#/components/schemas/User'
+        created:
+          type: string
+          format: date-time
+    Review:
+      type: object
+      properties:
+        creator:
+          $ref: '#/components/schemas/User'
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        body:
+          type: string
+        ontologyReviewed:
+          $ref: '#/components/schemas/Ontology'
+        usabilityRating:
+          type: integer
+        coverageRating:
+          type: integer
+        qualityRating:
+          type: integer
+        formalityRating:
+          type: integer
+        correctnessRating:
+          type: integer
+        documentationRating:
+          type: integer
+    Slice:
+      type: object
+      properties:
+        acronym:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        created:
+          type: string
+          format: date-time
+        ontologies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ontology'
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        role:
+          type: array
+          items:
+            type: string
+        apikey:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        githubId:
+          type: string
+        orcidId:
+          type: string
+        created:
+          type: string
+          format: date-time
+        provisionalClasses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProvisionalClass'
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: "API key for authentication. The value should be in the format: `apikey token=YOUR_API_KEY`"
+security:
+  - ApiKeyAuth: []

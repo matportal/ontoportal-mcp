@@ -1,0 +1,16 @@
+# Python virtual environments
+.venv/
+
+# Bytecode and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Logs and local artifacts
+mcp_server.log
+
+# Environment files
+.env
+
+# System files
+.DS_Store

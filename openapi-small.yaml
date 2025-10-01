@@ -1,0 +1,692 @@
+openapi: 3.1.0
+info:
+  title: Ontology Web Service API
+  description: >
+    This API allows access to a set of ontology-related resources and services, including term search, ontology property search, annotator, recommender, mappings, and more. Resources are connected via hypermedia links.
+  version: 1.1.0
+  contact:
+    email: mail@matolab.org
+servers:
+  - url: https://rest.matportal.org
+
+tags:
+  - name: General
+  - name: Term Search
+  - name: Annotator
+  - name: Recommender
+  - name: Resource Index
+  - name: Ontology Analytics
+  - name: Categories
+  - name: Classes
+  - name: Groups
+  - name: Instances
+  - name: Mappings
+  - name: Metrics
+  - name: Notes
+  - name: Object Properties
+  - name: Ontologies
+  - name: Ontology Submissions
+  - name: Projects
+  - name: Provisional Classes
+  - name: Reviews
+  - name: Slices
+  - name: Users
+  - name: Batch
+
+paths:
+  /search:
+    get:
+      summary: Perform term search
+      operationId: searchTerms
+      tags:
+        - Term Search
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Search query
+          schema:
+            type: string
+        - name: ontologies
+          in: query
+          description: Comma-separated list of ontology IDs
+          schema:
+            type: string
+        - name: require_exact_match
+          in: query
+          description: Require exact match (true/false)
+          schema:
+            type: boolean
+        - name: suggest
+          in: query
+          description: Perform type-ahead suggestions (true/false)
+          schema:
+            type: boolean
+        - name: include
+          in: query
+          description: Comma-separated list of attributes to include in results
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+        - name: pagesize
+          in: query
+          description: Page size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response with search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResults'
+        '400':
+          description: Bad request
+
+  /annotator:
+    get:
+      summary: Annotate text with ontology terms
+      operationId: annotateText
+      tags:
+        - Annotator
+      parameters:
+        - name: text
+          in: query
+          required: true
+          description: Text to be annotated
+          schema:
+            type: string
+        - name: ontologies
+          in: query
+          description: Comma-separated list of ontology IDs
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response with annotations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnnotationsResponse'
+        '400':
+          description: Bad request
+
+  /recommender:
+    get:
+      summary: Recommend ontologies for a given text or keyword input
+      operationId: recommendOntologies
+      tags:
+        - Recommender
+      parameters:
+        - name: input
+          in: query
+          required: true
+          description: Text or keywords for ontology recommendations
+          schema:
+            type: string
+        - name: input_type
+          in: query
+          description: Specify input type (1 for text, 2 for keywords)
+          schema:
+            type: integer
+        - name: output_type
+          in: query
+          description: Specify output type (1 for individual ontologies, 2 for ontology sets)
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response with recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationsResponse'
+        '400':
+          description: Bad request
+
+  /resource_index:
+    get:
+      summary: Search the Resource Index for annotated resources
+      operationId: searchResourceIndex
+      tags:
+        - Resource Index
+      parameters:
+        - name: classes
+          in: query
+          description: Class IDs to search within (comma-separated)
+          schema:
+            type: string
+        - name: boolean_operator
+          in: query
+          description: Operator for class search (and/or)
+          schema:
+            type: string
+        - name: expand_class_hierarchy
+          in: query
+          description: Search all descendants of the given class (true/false)
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Successful response with resource results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceSearchResponse'
+        '400':
+          description: Bad request
+
+  /analytics:
+    get:
+      summary: Retrieve ontology visitor stats
+      operationId: getOntologyAnalytics
+      tags:
+        - Ontology Analytics
+      parameters:
+        - name: month
+          in: query
+          description: Month number (1-12)
+          schema:
+            type: integer
+        - name: year
+          in: query
+          description: Year
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response with analytics data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse'
+        '400':
+          description: Bad request
+
+  /ontologies:
+    get:
+      summary: Retrieve all ontologies
+      operationId: getOntologies
+      tags:
+        - Ontologies
+      responses:
+        '200':
+          description: List of ontologies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ontology'
+
+  /ontologies/{acronym}:
+    get:
+      summary: Retrieve details of a specific ontology
+      operationId: getOntology
+      tags:
+        - Ontologies
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          description: The acronym of the ontology
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ontology details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ontology'
+
+  /ontologies/{acronym}/classes:
+    get:
+      summary: Retrieve all classes for an ontology
+      operationId: getOntologyClasses
+      tags:
+        - Classes
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          description: The acronym of the ontology
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of classes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Class'
+
+  /ontologies/{acronym}/classes/{class}:
+    get:
+      summary: Retrieve details for a specific class
+      operationId: getClassDetails
+      tags:
+        - Classes
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          description: The acronym of the ontology
+          schema:
+            type: string
+        - name: class
+          in: path
+          required: true
+          description: The class ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Class details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Class'
+
+  /ontologies/{acronym}/groups:
+    get:
+      summary: Retrieve all groups for a specific ontology
+      operationId: getOntologyGroups
+      tags:
+        - Groups
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          description: The acronym of the ontology
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of ontology groups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+
+  /ontologies/{acronym}/metrics:
+    get:
+      summary: Retrieve metrics for a specific ontology
+      operationId: getOntologyMetrics
+      tags:
+        - Metrics
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          description: The acronym of the ontology
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ontology metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metrics'
+
+  /ontologies/{acronym}/notes:
+    get:
+      summary: Retrieve notes for a specific ontology
+      operationId: getOntologyNotes
+      tags:
+        - Notes
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          description: The acronym of the ontology
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of ontology notes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+
+  /ontologies/{acronym}/properties:
+    get:
+      summary: Retrieve all properties for a specific ontology
+      operationId: getOntologyProperties
+      tags:
+        - Object Properties
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          description: The acronym of the ontology
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of properties
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectProperty'
+
+  /ontologies/{acronym}/submissions:
+    get:
+      summary: Retrieve submissions for a specific ontology
+      operationId: getOntologySubmissions
+      tags:
+        - Ontology Submissions
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          description: The acronym of the ontology
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of ontology submissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OntologySubmission'
+
+  /ontologies/{acronym}/provisional_classes:
+    get:
+      summary: Retrieve all provisional classes for a specific ontology
+      operationId: getProvisionalClasses
+      tags:
+        - Provisional Classes
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          description: The acronym of the ontology
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of provisional classes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProvisionalClass'
+
+  /ontologies/{acronym}/reviews:
+    get:
+      summary: Retrieve reviews for a specific ontology
+      operationId: getOntologyReviews
+      tags:
+        - Reviews
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          description: The acronym of the ontology
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of ontology reviews
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+
+  /categories:
+    get:
+      summary: Retrieve all categories
+      operationId: getCategories
+      tags:
+        - Categories
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+
+  /categories/{acronym}:
+    get:
+      summary: Retrieve specific category by acronym
+      operationId: getCategory
+      tags:
+        - Categories
+      parameters:
+        - name: acronym
+          in: path
+          required: true
+          description: The acronym of the category
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Category details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+
+  /batch:
+    post:
+      summary: Perform a batch request for multiple ontology classes
+      operationId: batchOntologyClasses
+      tags:
+        - Batch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                http://www.w3.org/2002/07/owl#Class:
+                  type: object
+                  properties:
+                    collection:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          class:
+                            type: string
+                            description: "The URL of the ontology class"
+                          ontology:
+                            type: string
+                            description: "The URL of the ontology the class belongs to"
+                    display:
+                      type: string
+                      description: "Comma-separated list of fields to be returned for each class (e.g., prefLabel, synonym, semanticTypes)"
+      responses:
+        '200':
+          description: Batch response with ontology classes.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  http://www.w3.org/2002/07/owl#Class:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        prefLabel:
+                          type: string
+                        synonym:
+                          type: array
+                          items: 
+                            type: string
+                        semanticTypes:
+                          type: array
+                          items:
+                            type: string
+
+components:
+  schemas:
+    SearchResults:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              id:
+                type: string
+              definition:
+                type: string
+
+    AnnotationsResponse:
+      type: object
+      properties:
+        annotations:
+          type: array
+          items:
+            type: object
+            properties:
+              term:
+                type: string
+              ontology:
+                type: string
+
+    RecommendationsResponse:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            type: object
+            properties:
+              ontology:
+                type: string
+              score:
+                type: number
+
+    ResourceSearchResponse:
+      type: object
+      properties:
+        resources:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              title:
+                type: string
+              description:
+                type: string
+
+    AnalyticsResponse:
+      type: object
+      properties:
+        totalVisits:
+          type: integer
+        uniqueVisits:
+          type: integer
+
+    Ontology:
+      type: object
+      properties:
+        acronym:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+
+    Class:
+      type: object
+      properties:
+        prefLabel:
+          type: string
+        synonym:
+          type: array
+          items:
+            type: string
+        definition:
+          type: string
+
+    Group:
+      type: object
+      properties:
+        acronym:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+
+    Metrics:
+      type: object
+      properties:
+        classes:
+          type: integer
+        individuals:
+          type: integer
+
+    Note:
+      type: object
+      properties:
+        subject:
+          type: string
+        body:
+          type: string
+
+    ObjectProperty:
+      type: object
+      properties:
+        label:
+          type: string
+        definition:
+          type: string
+
+    OntologySubmission:
+      type: object
+      properties:
+        submissionId:
+          type: string
+        version:
+          type: string
+
+    ProvisionalClass:
+      type: object
+      properties:
+        label:
+          type: string
+        definition:
+          type: string
+
+    Review:
+      type: object
+      properties:
+        body:
+          type: string
+        usabilityRating:
+          type: integer
+
+    Category:
+      type: object
+      properties:
+        acronym:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: query
+      name: apikey
+
+security:
+  - apiKeyAuth: []

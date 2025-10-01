@@ -1,0 +1,9 @@
+model = "gpt-5-codex"  # Replace with your actual Azure model deployment name
+model_provider = "azure"
+model_reasoning_effort = "medium"
+
+[model_providers.azure]
+name = "Azure OpenAI"
+base_url = "https://ai-librechathub143226993478.openai.azure.com/openai/v1"
+env_key = "6KJdytmyxM0Pv4yWpU6uSkzNJZVmEAvNFeucbdcuaqUh4iJvZbr7JQQJ99BAACfhMk5XJ3w3AAAAACOGrPyy"
+wire_api = "responses"
