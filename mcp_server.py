@@ -1,34 +1,13 @@
 import os
-from pathlib import Path
 from typing import Any, Mapping
 
 import httpx
 import yaml
+from env_utils import get_required_env, load_env_file
 from fastmcp import FastMCP
 from fastmcp.server import context as fastmcp_context
 from fastmcp.server.middleware.middleware import Middleware
 from fastmcp.server.middleware.middleware import MiddlewareContext
-
-
-def load_env_file(path: str = ".env") -> None:
-    """Simple .env loader to avoid external dependencies."""
-    env_path = Path(path)
-    if not env_path.exists():
-        return
-
-    for line in env_path.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        if "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        key = key.strip()
-        value = value.strip().strip('"').strip("'")
-        os.environ.setdefault(key, value)
-
-# Enable the new OpenAPI parser
-os.environ['FASTMCP_EXPERIMENTAL_ENABLE_NEW_OPENAPI_PARSER'] = 'true'
 
 # Load optional environment overrides
 load_env_file()
@@ -40,11 +19,8 @@ with open('openapi-small.yaml', 'r') as f:
 # Create an HTTP client for the OntoPortal API
 # The base URL is taken from the OpenAPI spec's servers section
 # Override base URL as requested
-DEFAULT_BASE_URL = os.getenv("ONTO_PORTAL_BASE_URL", "http://rest.matportal.org")
-DEFAULT_API_KEY = os.getenv(
-    "ONTO_PORTAL_API_KEY",
-    "60eab942-ece4-4cd0-a15a-0fc8b1d70c52",
-)
+DEFAULT_BASE_URL = get_required_env("ONTO_PORTAL_BASE_URL")
+DEFAULT_API_KEY = get_required_env("ONTO_PORTAL_API_KEY")
 
 
 class QueryParamMiddleware(Middleware):
@@ -123,7 +99,7 @@ class ContextAwareAsyncClient:
         merged_headers["Authorization"] = f"apikey token={api_key}"
 
         target_url = httpx.URL(url)
-        if not target_url.is_absolute():
+        if not target_url.is_absolute_url:
             target_url = base_url.join(target_url)
 
         return await self._client.request(
@@ -159,6 +135,6 @@ mcp.add_middleware(QueryParamMiddleware(DEFAULT_API_KEY, DEFAULT_BASE_URL))
 
 
 if __name__ == "__main__":
-    host = os.getenv("MCP_HOST", "0.0.0.0")
-    port = int(os.getenv("MCP_PORT", "8000"))
+    host = get_required_env("MCP_HOST")
+    port = int(get_required_env("MCP_PORT"))
     mcp.run(transport="http", host=host, port=port)

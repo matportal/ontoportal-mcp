@@ -21,13 +21,13 @@ This project contains an MCP (Model Context Protocol) server for the OntoPortal 
 
 Configuration values (OntoPortal base URL, API key, host/port) reside in `.env`. A template is provided in `.env.example`; copy it, adjust the values, and keep `.env` out of version control.
 
-Start the Streamable HTTP MCP server on port 8000:
+Start the Streamable HTTP MCP server (host and port come from `.env`):
 
 ```bash
 .venv/bin/python mcp_server.py
 ```
 
-The server will listen on `http://127.0.0.1:8000/mcp` and forward tool calls to the OntoPortal REST API using the built-in API key defined in `mcp_server.py`.
+The server will listen on the configured host/port (default `0.0.0.0:8000`) and forward tool calls to the OntoPortal REST API using the API key defined in `.env`.
 
 ## Client Usage
 
@@ -35,10 +35,10 @@ The server will listen on `http://127.0.0.1:8000/mcp` and forward tool calls to 
 
 ```python
 import asyncio
-from mcp_client import OntoPortalMCPClient
+from mcp_client import OntoPortalMCPClient, default_mcp_url
 
 async def main():
-    client = OntoPortalMCPClient("http://127.0.0.1:8000/mcp")
+    client = OntoPortalMCPClient(default_mcp_url())
     async with client:
         tools = await client.list_tools()
         print(len(tools), tools[0].name)
@@ -57,7 +57,7 @@ The server also accepts connection-specific overrides via query parameters on th
 - `api_key`: OntoPortal API key that should be forwarded as `Authorization: apikey token=...`.
 - `base_url`: OntoPortal REST base URL (defaults to `http://rest.matportal.org`).
 
-Example URL:
+Example URL (replace the port if you changed `MCP_PORT`):
 
 ```
 http://your-server:8000/mcp?api_key=YOUR_KEY&base_url=https://rest.example.org
@@ -70,11 +70,11 @@ Each connection maintains its own overrides, so multiple clients can supply diff
 The pytest suite uses live integration tests located in `tests/test_mcp_client.py`. They require a reachable MCP endpoint.
 
 1. Start the server (see above) or provide a remote URL.
-2. Optionally point the tests at a different server with `ONTO_PORTAL_MCP_URL`.
+2. Optionally point the tests at a different server with `ONTO_PORTAL_MCP_URL` or set `MCP_PORT`/`ONTO_PORTAL_MCP_CLIENT_HOST`.
 3. Run:
 
     ```bash
-    ONTO_PORTAL_MCP_URL="http://127.0.0.1:8000/mcp" .venv/bin/python -m pytest
+    .venv/bin/python -m pytest
     ```
 
 If the server cannot be reached the tests are skipped so CI runs remain green when the endpoint is unavailable.
@@ -82,7 +82,7 @@ If the server cannot be reached the tests are skipped so CI runs remain green wh
 To perform a quick manual probe use:
 
 ```bash
-.venv/bin/python check_http_access.py --url "http://server:8000/mcp"
+.venv/bin/python check_http_access.py --url "http://server:YOUR_PORT/mcp"
 ```
 
 ## Authentication

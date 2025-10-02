@@ -7,7 +7,7 @@ import asyncio
 import os
 from typing import Optional
 
-from mcp_client import OntoPortalMCPClient
+from mcp_client import OntoPortalMCPClient, default_mcp_url
 
 
 async def check_access(url: str, token: Optional[str]) -> None:
@@ -36,7 +36,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Check MCP server HTTP accessibility")
     parser.add_argument(
         "--url",
-        default=os.getenv("ONTO_PORTAL_MCP_URL", "http://127.0.0.1:8000/mcp"),
+        default=default_mcp_url(),
         help="MCP server URL (default: %(default)s)",
     )
     parser.add_argument(

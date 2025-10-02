@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 from typing import Any
 
 import httpx
+from env_utils import load_env_file
 from fastmcp import Client as FastMCPClient
 from fastmcp.client.client import CallToolResult
 from fastmcp.client.transports import ClientTransport, infer_transport
@@ -43,6 +45,19 @@ class _TransportSpec:
                     "Authentication token provided but transport does not support auth"
                 ) from exc
         return transport
+
+
+def default_mcp_url() -> str:
+    """Return the MCP server URL based on environment configuration."""
+
+    load_env_file()
+    env_url = os.getenv("ONTO_PORTAL_MCP_URL")
+    if env_url:
+        return env_url
+
+    port = os.getenv("MCP_PORT", "8000")
+    host = os.getenv("ONTO_PORTAL_MCP_CLIENT_HOST", "127.0.0.1")
+    return f"http://{host}:{port}/mcp"
 
 
 class OntoPortalMCPClient:
@@ -155,4 +170,5 @@ __all__ = [
     "OntoPortalMCPClientError",
     "OntoPortalMCPAuthenticationError",
     "OntoPortalMCPToolError",
+    "default_mcp_url",
 ]

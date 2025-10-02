@@ -3,10 +3,14 @@ import os
 import pytest
 import pytest_asyncio
 
-from mcp_client import OntoPortalMCPClient, OntoPortalMCPToolError
+from mcp_client import (
+    OntoPortalMCPClient,
+    OntoPortalMCPToolError,
+    default_mcp_url,
+)
 
 
-MCP_URL = os.environ.get("ONTO_PORTAL_MCP_URL", "http://127.0.0.1:8000/mcp")
+MCP_URL = default_mcp_url()
 
 
 def _skip_for_unreachable(exc: Exception) -> None:

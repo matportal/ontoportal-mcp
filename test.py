@@ -1,8 +1,9 @@
 import asyncio
-from mcp_client import OntoPortalMCPClient
+
+from mcp_client import OntoPortalMCPClient, default_mcp_url
 
 async def main():
-    client = OntoPortalMCPClient("http://127.0.0.1:8000/mcp")
+    client = OntoPortalMCPClient(default_mcp_url())
     async with client:
         tools = await client.list_tools()
         print(len(tools), tools[0].name)
