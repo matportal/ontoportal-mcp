@@ -47,6 +47,22 @@ Container images are provided via the included `Dockerfile` and `docker-compose.
 
 Override the host port via `HOST_MCP_PORT=9000 docker compose up server`. Update `.env` if you need different API credentials or want the containers to listen on another internal port.
 
+### Local Diagnostics
+
+- Run the server directly inside the virtualenv for quick testing:
+
+  ```bash
+  .venv/bin/python mcp_server.py
+  ```
+
+- In a second shell, exercise the API:
+
+  ```bash
+  .venv/bin/python check_http_access.py
+  ```
+
+  Successful runs will log lines such as `OntoPortal client request start` and `HTTPX ... -> https://rest.matportal.org/search`, confirming the REST gateway is reachable.
+
 ## Client Usage
 
 `OntoPortalMCPClient` wraps `fastmcp.Client`, handles Streamable HTTP transport setup, and optionally attaches a bearer token. Example usage (matches `test.py`):

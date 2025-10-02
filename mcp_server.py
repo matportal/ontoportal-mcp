@@ -1,6 +1,8 @@
+import logging
 import os
 from typing import Any, Mapping
 
+import fastmcp
 import httpx
 import yaml
 from env_utils import get_required_env, load_env_file
@@ -8,6 +10,9 @@ from fastmcp import FastMCP
 from fastmcp.server import context as fastmcp_context
 from fastmcp.server.middleware.middleware import Middleware
 from fastmcp.server.middleware.middleware import MiddlewareContext
+
+# Configure logging early so container logs capture diagnostics
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(levelname)s %(message)s")
 
 # Load optional environment overrides
 load_env_file()
@@ -92,6 +97,14 @@ class ContextAwareAsyncClient:
         api_key = session_api_key or self._default_api_key
         base_url = httpx.URL(session_base_url or str(self._default_base_url))
 
+        logging.info(
+            "OntoPortal client request start: method=%s url=%r session_base=%r session_api_key=%s",
+            method,
+            url,
+            session_base_url,
+            bool(session_api_key),
+        )
+
         merged_headers: dict[str, str] = {}
         if headers:
             merged_headers.update(headers)
@@ -100,7 +113,35 @@ class ContextAwareAsyncClient:
 
         target_url = httpx.URL(url)
         if not target_url.is_absolute_url:
+            logging.info(
+                "Joining relative URL '%s' with base '%s' (session_base=%s)",
+                target_url,
+                base_url,
+                session_base_url,
+            )
             target_url = base_url.join(target_url)
+
+        if not target_url.scheme:
+            logging.error(
+                "Resolved target URL lacks scheme: original=%r base=%r session_base=%r -> %r",
+                url,
+                base_url,
+                session_base_url,
+                target_url,
+            )
+            raise ValueError(
+                "Resolved target URL lacks scheme",
+            )
+
+        logging.info(
+            "HTTPX %s request %s -> %s (base=%s session_base=%s params=%s)",
+            httpx.__version__,
+            method,
+            target_url,
+            base_url,
+            session_base_url,
+            params,
+        )
 
         return await self._client.request(
             method=method,
@@ -135,6 +176,12 @@ mcp.add_middleware(QueryParamMiddleware(DEFAULT_API_KEY, DEFAULT_BASE_URL))
 
 
 if __name__ == "__main__":
+    fastmcp_version = getattr(fastmcp, "__version__", "unknown")
+    logging.info(
+        "Starting OntoPortal MCP with httpx=%s fastmcp=%s",
+        httpx.__version__,
+        fastmcp_version,
+    )
     host = get_required_env("MCP_HOST")
     port = int(get_required_env("MCP_PORT"))
     mcp.run(transport="http", host=host, port=port)
