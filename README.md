@@ -29,6 +29,24 @@ Start the Streamable HTTP MCP server (host and port come from `.env`):
 
 The server will listen on the configured host/port (default `0.0.0.0:8000`) and forward tool calls to the OntoPortal REST API using the API key defined in `.env`.
 
+### Docker Compose
+
+Container images are provided via the included `Dockerfile` and `docker-compose.yml` for local development or quick smoke tests.
+
+- Build and start the server:
+
+  ```bash
+  docker compose up --build server
+  ```
+
+- Run the smoke test (starts the server container, waits for it to become healthy, then executes `check_http_access.py` from a second container):
+
+  ```bash
+  docker compose up --build smoke
+  ```
+
+Override the host port via `HOST_MCP_PORT=9000 docker compose up server`. Update `.env` if you need different API credentials or want the containers to listen on another internal port.
+
 ## Client Usage
 
 `OntoPortalMCPClient` wraps `fastmcp.Client`, handles Streamable HTTP transport setup, and optionally attaches a bearer token. Example usage (matches `test.py`):

@@ -1,0 +1,27 @@
+services:
+  server:
+    build: .
+    env_file:
+      - .env
+    environment:
+      MCP_PORT: ${MCP_PORT:-8083}
+      MCP_HOST: 0.0.0.0
+    ports:
+      - "${HOST_MCP_PORT:-8083}:${MCP_PORT:-8083}"
+    healthcheck:
+      test: ["CMD", "python", "docker_healthcheck.py"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  smoke:
+    build: .
+    env_file:
+      - .env
+    environment:
+      ONTO_PORTAL_MCP_URL: http://server:${MCP_PORT:-8083}/mcp
+    command: ["python", "check_http_access.py"]
+    depends_on:
+      server:
+        condition: service_healthy
