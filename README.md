@@ -50,6 +50,21 @@ asyncio.run(main())
 
 Set the `token` parameter if the server expects a bearer credential (the current configuration does not enforce JWT verification).
 
+### Passing configuration via the MCP URL
+
+The server also accepts connection-specific overrides via query parameters on the MCP endpoint. This is useful when a client (e.g., Dify) can only provide credentials in the URL.
+
+- `api_key`: OntoPortal API key that should be forwarded as `Authorization: apikey token=...`.
+- `base_url`: OntoPortal REST base URL (defaults to `http://rest.matportal.org`).
+
+Example URL:
+
+```
+http://your-server:8000/mcp?api_key=YOUR_KEY&base_url=https://rest.example.org
+```
+
+Each connection maintains its own overrides, so multiple clients can supply different keys or endpoints without restarting the server.
+
 ## Tests
 
 The pytest suite uses live integration tests located in `tests/test_mcp_client.py`. They require a reachable MCP endpoint.

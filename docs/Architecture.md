@@ -43,6 +43,7 @@ Purpose:
 - [openapi.yaml](openapi.yaml), [openapi-small.yaml](openapi-small.yaml): OntoPortal OpenAPI specifications.
 - [mcp_server.py](mcp_server.py): MCP server implementation and OpenAPI-to-tools mapping.
 - [mcp_client.py](../mcp_client.py): Async client wrapper for Streamable HTTP connections, used by tooling and tests.
+- [check_http_access.py](../check_http_access.py): Connectivity probe that exercises `list_tools` and a sample tool call.
 - [validate.py](validate.py): Spec validation helpers.
 - [generate_token.py](generate_token.py): JWT token creation utility.
 - [.env.example](../.env.example): Sample environment configuration (copy to `.env` and edit for deployment).
@@ -55,6 +56,8 @@ Purpose:
 The MCP server translates OpenAPI operations into callable tools and serves them over Streamable HTTP. When a client invokes a tool:
 1. The server issues an HTTP call to OntoPortal using [httpx.AsyncClient()](mcp_server.py:17), mapping tool parameters to API request parameters.
 2. Responses are returned to the client via MCP.
+
+Connections may optionally supply query parameters on the MCP URL (e.g. `?api_key=...&base_url=...`). A lightweight middleware extracts these values on the `initialize` request and stores them with the underlying session so every subsequent tool call uses the caller’s specific OntoPortal API key and base URL.
 
 OpenAPI-to-tool mapping is established through [FastMCP.from_openapi()](mcp_server.py:32), loading spec content (often via [yaml.safe_load()](mcp_server.py:12) semantics) and registering operations. The server runtime is initiated with [mcp.run()](mcp_server.py:41).
 
@@ -140,6 +143,7 @@ Current layers:
    - The MCP server stores an ApiKey (see [mcp_server.py](mcp_server.py)) and attaches it to every OntoPortal request.
 2. Optional MCP-side authentication
    - The Streamable HTTP endpoint does not enforce authentication by default. Deployments can introduce JWT, mTLS, or gateway-level checks. The `generate_token.py` utility demonstrates how a JWT flow could be implemented if desired.
+   - Query parameters (`api_key`, `base_url`) on the MCP URL allow per-connection overrides without exposing secrets in model prompts.
 
 Future hardening considerations:
 - Externalize secrets (API keys or tokens) into environment variables or secret managers.
@@ -206,6 +210,7 @@ Base URL selection:
 
 `.env` support:
 - Default configuration values (OntoPortal base URL, API key, MCP host/port) live in `.env`. On startup the helper loads this file automatically before consulting real environment variables, allowing simple overrides without exporting variables system-wide. Use [.env.example](../.env.example) as the template.
+- Connection-level overrides can be provided via query parameters on the MCP endpoint (e.g. `?api_key=...&base_url=...`). These are captured during the `initialize` handshake and stored on the session so every subsequent tool call uses the supplied credentials and REST base URL.
 
 ## 10) Deployment and Runtime [deployment-runtime]
 
