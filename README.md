@@ -47,6 +47,20 @@ Container images are provided via the included `Dockerfile` and `docker-compose.
 
 Override the host port via `HOST_MCP_PORT=9000 docker compose up server`. Update `.env` if you need different API credentials or want the containers to listen on another internal port.
 
+### Managed Endpoint
+
+A hosted instance is available at `https://mcp.matportal.org/mcp`. To use it:
+
+1. Create an account on the OntoPortal instance you want to target (e.g., BioPortal, AgroPortal) and generate an API key.
+2. Note the REST API base URL for that portal (for example, `https://data.bioontology.org` or `https://data.agroportal.lirmm.fr`).
+3. Construct the MCP URL by appending your credentials as query parameters, e.g.:
+
+   ```text
+   https://mcp.matportal.org/mcp?api_key=YOUR_API_KEY&base_url=https://data.bioontology.org
+   ```
+
+   Replace the `base_url` value with the REST endpoint of the portal you’re testing. Clients (including `check_http_access.py` or an MCP-compatible tool) can connect directly to this URL without running the server locally.
+
 ### Local Diagnostics
 
 - Run the server directly inside the virtualenv for quick testing:
